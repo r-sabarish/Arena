@@ -1,5 +1,5 @@
 ## About Arena
-Arena is a gaming platform that makes it easy and fun for office teams to play games together online.  
+Arena is a gaming platform that makes it easy and fun for office teams to play games together online.
 
 Combining robust backend services with engaging gameplay, Arena delivers a smooth, interactive experience directly in your browser.
 - Website & Authentication: Built with Next.js, featuring secure sign-in powered by NextAuth and Azure AD (via Azure Entra OpenID).
