@@ -165,7 +165,7 @@ function SpaceModel() {
 
 export default function SceneWithCanvasTextAndModel({ name = '' }) {
     return (
-        <div style={{ width: '100%', height: '100vh' }}>
+        <div className="w-full h-screen">
             <Canvas camera={{ position: [0, 0, 30], fov: 50 }} shadows>
                 <ambientLight intensity={1.5} />
                 <directionalLight position={[10, 10, 10]} intensity={2} castShadow />

@@ -12,25 +12,6 @@ function formatTime(seconds: number) {
     return `${h}:${m}:${s}`;
 }
 
-const styles = {
-    position: 'fixed' as const,
-    top: 10,
-    left: 100,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    color: 'white',
-    padding: '8px 14px',
-    borderRadius: '8px',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-    zIndex: 9999,
-    userSelect: 'none' as const,
-    pointerEvents: 'none' as const,
-    minWidth: '160px',
-    textAlign: 'left' as const,
-    fontSize: '14px',
-    lineHeight: 1.4,
-    whiteSpace: 'pre-line' as const,
-};
 
 export default function PlayTimer() {
     const { isUnityLoaded } = useUnitySession();
@@ -45,7 +26,7 @@ export default function PlayTimer() {
     if (!isUnityLoaded) return null;
 
     return (
-        <div style={styles}>
+        <div className="fixed top-2.5 left-25 bg-black/70 text-white p-2 rounded-lg font-bold font-mono z-50 select-none pointer-events-none min-w-40 text-left text-sm leading-relaxed whitespace-pre-line">
             Elapsed: {formatTime(elapsedTime)}
             {'\n'}
             Remaining: {formatTime(remainingDisplay)}

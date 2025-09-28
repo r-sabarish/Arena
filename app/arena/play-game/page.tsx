@@ -43,10 +43,7 @@ const PlayGamePage: React.FC = () => {
 
     if (loading) {
         return (
-            <div
-                className="aspect-video bg-white rounded-lg flex items-center justify-center"
-                style={{ width: "100%", height: "100vh" }}
-            >
+            <div className="w-full h-screen bg-white rounded-lg flex items-center justify-center">
                 Loading game...
             </div>
         );
@@ -54,10 +51,7 @@ const PlayGamePage: React.FC = () => {
 
     if (!game) {
         return (
-            <div
-                className="aspect-video bg-white rounded-lg flex items-center justify-center"
-                style={{ width: "100%", height: "100vh" }}
-            >
+            <div className="w-full h-screen bg-white rounded-lg flex items-center justify-center">
                 Game not found
             </div>
         );

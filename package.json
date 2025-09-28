@@ -31,14 +31,15 @@
     "three": "^0.177.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sqlite3": "^5.1.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }
