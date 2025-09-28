@@ -18,6 +18,7 @@ interface Game {
     details: string;
     category: string[];
     publisher: string;
+    type: string;
 }
 
 export default function GameDetailPage() {
@@ -96,14 +97,24 @@ export default function GameDetailPage() {
                                 alt={`${game.title} preview ${activeIndex + 1}`}
                                 className={styles.previewImage}
                             />
-                        ) : (
+                        ) : game.video ? (
                             <video
-                                src={game.video!}
+                                src={game.video}
                                 className={styles.previewVideo}
                                 autoPlay
                                 playsInline
                                 controls
                             />
+                        ) : (
+                            <div className={styles.previewImage} style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                backgroundColor: '#f8f9fa',
+                                color: '#666'
+                            }}>
+                                No video available
+                            </div>
                         )}
                     </div>
 
@@ -146,6 +157,13 @@ export default function GameDetailPage() {
                     <div>
                         <h2 className={styles.sectionHeader}>Publisher</h2>
                         <p className={styles.publisher}>{game.publisher}</p>
+                    </div>
+
+                    <div>
+                        <h2 className={styles.sectionHeader}>Game Type</h2>
+                        <p className={styles.gameType}>
+                            {game.type === 'unity' ? '🎮 Unity WebGL' : '🌐 HTML Game'}
+                        </p>
                     </div>
 
                     <div>

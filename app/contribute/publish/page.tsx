@@ -8,6 +8,7 @@ import SignIn from '@/components/auth/SignIn';
 
 export default function Publish() {
     const [step, setStep] = useState(1);
+    const [gameType, setGameType] = useState<'unity' | 'html' | null>(null);
     const { data: session, status } = useSession();
 
     const [gameId, setGameId] = useState('');
@@ -25,6 +26,10 @@ export default function Publish() {
 
     const [hasStreamingAssets, setHasStreamingAssets] = useState(false);
     const [streamingAssetsFiles, setStreamingAssetsFiles] = useState<FileList | null>(null);
+    
+    // HTML game files
+    const [htmlFiles, setHtmlFiles] = useState<FileList | null>(null);
+    const [uploadType, setUploadType] = useState<'folder' | 'files'>('folder');
 
     const [uploaded, setUploaded] = useState(false);
     const [available, setAvailable] = useState<boolean | null>(null);
@@ -36,7 +41,12 @@ export default function Publish() {
     };
 
     const canSubmit = () => {
-        return dataFile !== null && wasmFile !== null && frameworkFile !== null && loaderFile !== null;
+        if (gameType === 'unity') {
+            return dataFile !== null && wasmFile !== null && frameworkFile !== null && loaderFile !== null;
+        } else if (gameType === 'html') {
+            return htmlFiles !== null && htmlFiles.length > 0;
+        }
+        return false;
     };
 
     const handleUpload = async (force = false) => {
@@ -57,7 +67,6 @@ export default function Publish() {
         formData.append('description', description);
         formData.append('details', details);
         formData.append('publisher', session?.user?.email || "magician");
-        formData.append('hasStreamingAssets', hasStreamingAssets ? 'true' : 'false');
 
         if (gameImages) {
             Array.from(gameImages).forEach((file) => formData.append('gameImages', file));
@@ -66,14 +75,21 @@ export default function Publish() {
             formData.append('gameVideo', gameVideo);
         }
 
-        formData.append('files', dataFile!);
-        formData.append('files', wasmFile!);
-        formData.append('files', frameworkFile!);
-        formData.append('files', loaderFile!);
+        if (gameType === 'unity') {
+            formData.append('hasStreamingAssets', hasStreamingAssets ? 'true' : 'false');
+            formData.append('files', dataFile!);
+            formData.append('files', wasmFile!);
+            formData.append('files', frameworkFile!);
+            formData.append('files', loaderFile!);
 
-        if (hasStreamingAssets && streamingAssetsFiles) {
-            Array.from(streamingAssetsFiles).forEach((file) => {
-                formData.append('streamingAssetsFiles', file, file.webkitRelativePath);
+            if (hasStreamingAssets && streamingAssetsFiles) {
+                Array.from(streamingAssetsFiles).forEach((file) => {
+                    formData.append('streamingAssetsFiles', file, file.webkitRelativePath);
+                });
+            }
+        } else if (gameType === 'html') {
+            Array.from(htmlFiles!).forEach((file) => {
+                formData.append('htmlFiles', file);
             });
         }
 
@@ -81,7 +97,8 @@ export default function Publish() {
             formData.append('force', 'true');
         }
 
-        const res = await fetch('/api/publish', {
+        const endpoint = gameType === 'unity' ? '/api/publish/unity' : '/api/publish/html';
+        const res = await fetch(endpoint, {
             method: 'POST',
             body: formData,
         });
@@ -131,13 +148,81 @@ export default function Publish() {
 
     return (
         <div className={styles.wrapper}>
-            <h1 className={styles.title}>Publish Unity WebGL Build</h1>
+            <h1 className={styles.title}>Publish Game</h1>
             <h6 className={styles.uploader}>Publisher : {session.user?.name}</h6>
 
             {!uploaded && (
                 <>
-                    {step === 1 && (
+                    {step === 1 && !gameType && (
                         <>
+                            <h2>Choose Game Type</h2>
+                            <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+                                <button
+                                    className={styles.gameTypeButton}
+                                    onClick={() => setGameType('unity')}
+                                    style={{
+                                        padding: '20px',
+                                        border: '2px solid #007bff',
+                                        borderRadius: '8px',
+                                        background: 'white',
+                                        cursor: 'pointer',
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
+                                        flex: 1
+                                    }}
+                                >
+                                    Unity WebGL Build
+                                    <br />
+                                    <small style={{ fontWeight: 'normal', color: '#666' }}>
+                                        Upload .data, .wasm, .framework.js, .loader.js files
+                                    </small>
+                                </button>
+                                <button
+                                    className={styles.gameTypeButton}
+                                    onClick={() => setGameType('html')}
+                                    style={{
+                                        padding: '20px',
+                                        border: '2px solid #28a745',
+                                        borderRadius: '8px',
+                                        background: 'white',
+                                        cursor: 'pointer',
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
+                                        flex: 1
+                                    }}
+                                >
+                                    HTML Game
+                                    <br />
+                                    <small style={{ fontWeight: 'normal', color: '#666' }}>
+                                        Upload index.html, CSS, JS, and assets
+                                    </small>
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {step === 1 && gameType && (
+                        <>
+                            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <button
+                                    onClick={() => {
+                                        setGameType(null);
+                                        setStep(1);
+                                    }}
+                                    style={{
+                                        padding: '5px 10px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '4px',
+                                        background: 'white',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    ← Back to Game Type
+                                </button>
+                                <span style={{ fontWeight: 'bold' }}>
+                                    Publishing {gameType === 'unity' ? 'Unity WebGL' : 'HTML'} Game
+                                </span>
+                            </div>
                             <label>
                                 Game ID ❗️
                                 <input
@@ -241,7 +326,7 @@ export default function Publish() {
                         </>
                     )}
 
-                    {step === 2 && (
+                    {step === 2 && gameType === 'unity' && (
                         <>
                             <File label="DATA file (.data)*" accept=".data" onFileChange={setDataFile} />
                             <File label="WASM file (.wasm)*" accept=".wasm" onFileChange={setWasmFile} />
@@ -277,6 +362,192 @@ export default function Publish() {
                                 </div>
                             )} */}
 
+                            <div style={{ marginTop: '20px' }}>
+                                <button
+                                    className={styles.uploadBtn}
+                                    onClick={() => setStep(1)}
+                                    style={{ marginRight: '10px' }}
+                                >
+                                    Back
+                                </button>
+
+                                <button
+                                    className={styles.uploadBtn}
+                                    onClick={() => {
+                                        handleUpload();
+                                    }}
+                                    disabled={!canSubmit()}
+                                >
+                                    Upload Unity Build
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {step === 2 && gameType === 'html' && (
+                        <>
+                            <div style={{ marginBottom: '20px' }}>
+                                <h3>HTML Game Upload Options</h3>
+                                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <input
+                                            type="radio"
+                                            name="uploadType"
+                                            value="folder"
+                                            defaultChecked
+                                            onChange={() => setUploadType('folder')}
+                                        />
+                                        Upload Folder
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <input
+                                            type="radio"
+                                            name="uploadType"
+                                            value="files"
+                                            onChange={() => setUploadType('files')}
+                                        />
+                                        Upload Individual Files
+                                    </label>
+                                </div>
+                            </div>
+
+                            {uploadType === 'folder' && (
+                                <>
+                                    <label>
+                                        HTML Game Folder*
+                                        <input
+                                            type="file"
+                                            webkitdirectory="true"
+                                            directory="true"
+                                            multiple
+                                            onChange={(e) => setHtmlFiles(e.target.files)}
+                                            style={{ 
+                                                padding: '10px',
+                                                border: '2px dashed #ccc',
+                                                borderRadius: '8px',
+                                                width: '100%',
+                                                cursor: 'pointer'
+                                            }}
+                                        />
+                                        <small style={{ fontSize: 12, color: '#666', display: 'block', marginTop: '5px' }}>
+                                            Select your HTML game folder. All files and subfolders will be preserved.
+                                        </small>
+                                    </label>
+
+                                    {htmlFiles && htmlFiles.length > 0 && (
+                                        <div style={{ 
+                                            marginTop: '15px', 
+                                            padding: '15px', 
+                                            backgroundColor: '#f8f9fa', 
+                                            borderRadius: '8px',
+                                            border: '1px solid #e9ecef'
+                                        }}>
+                                            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
+                                                📁 Uploaded Files ({htmlFiles.length} files)
+                                            </h4>
+                                            <div style={{ 
+                                                maxHeight: '200px', 
+                                                overflowY: 'auto',
+                                                fontSize: '12px',
+                                                fontFamily: 'monospace'
+                                            }}>
+                                                {Array.from(htmlFiles).map((file, index) => (
+                                                    <div key={index} style={{ 
+                                                        padding: '2px 0',
+                                                        color: file.name.endsWith('.html') ? '#007bff' : '#666'
+                                                    }}>
+                                                        {file.webkitRelativePath || file.name}
+                                                        {file.name === 'index.html' && ' ⭐'}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {!Array.from(htmlFiles).some(f => f.name === 'index.html') && (
+                                                <div style={{ 
+                                                    marginTop: '10px', 
+                                                    padding: '8px', 
+                                                    backgroundColor: '#fff3cd', 
+                                                    border: '1px solid #ffeaa7',
+                                                    borderRadius: '4px',
+                                                    fontSize: '12px',
+                                                    color: '#856404'
+                                                }}>
+                                                    ⚠️ Warning: No index.html file found. Make sure your main HTML file is named 'index.html'
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {uploadType === 'files' && (
+                                <>
+                                    <label>
+                                        HTML Game Files*
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept=".html,.htm,.css,.js,.png,.jpg,.jpeg,.gif,.svg,.wav,.mp3,.ogg,.webm,.mp4"
+                                            onChange={(e) => setHtmlFiles(e.target.files)}
+                                            style={{ 
+                                                padding: '10px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '8px',
+                                                width: '100%'
+                                            }}
+                                        />
+                                        <small style={{ fontSize: 12, color: '#666', display: 'block', marginTop: '5px' }}>
+                                            Upload all your HTML game files (index.html, CSS, JS, images, sounds, etc.)
+                                        </small>
+                                    </label>
+
+                                    {htmlFiles && htmlFiles.length > 0 && (
+                                        <div style={{ 
+                                            marginTop: '15px', 
+                                            padding: '15px', 
+                                            backgroundColor: '#f8f9fa', 
+                                            borderRadius: '8px',
+                                            border: '1px solid #e9ecef'
+                                        }}>
+                                            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
+                                                📄 Selected Files ({htmlFiles.length} files)
+                                            </h4>
+                                            <div style={{ 
+                                                maxHeight: '150px', 
+                                                overflowY: 'auto',
+                                                fontSize: '12px'
+                                            }}>
+                                                {Array.from(htmlFiles).map((file, index) => (
+                                                    <div key={index} style={{ 
+                                                        padding: '2px 0',
+                                                        color: file.name.endsWith('.html') ? '#007bff' : '#666'
+                                                    }}>
+                                                        📄 {file.name}
+                                                        {file.name === 'index.html' && ' ⭐'}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            <div style={{ 
+                                marginTop: '20px', 
+                                padding: '15px', 
+                                backgroundColor: '#e7f3ff', 
+                                borderRadius: '8px',
+                                border: '1px solid #b3d9ff'
+                            }}>
+                                <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
+                                    📋 HTML Game Requirements
+                                </h4>
+                                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#0066cc' }}>
+                                    <li>Must include index.html as the main entry point</li>
+                                    <li>All file paths should be relative (no absolute URLs)</li>
+                                    <li>Maximum total size: 50MB</li>
+                                    <li>Supported formats: HTML, CSS, JS, PNG, JPG, GIF, SVG, MP3, WAV, OGG</li>
+                                </ul>
+                            </div>
 
                             <div style={{ marginTop: '20px' }}>
                                 <button
@@ -294,7 +565,7 @@ export default function Publish() {
                                     }}
                                     disabled={!canSubmit()}
                                 >
-                                    Upload
+                                    Upload HTML Game
                                 </button>
                             </div>
                         </>
@@ -302,7 +573,7 @@ export default function Publish() {
                 </>
             )}
 
-            {uploaded && <p>Unity Build Uploaded! You can now preview the game.</p>}
+            {uploaded && <p>{gameType === 'unity' ? 'Unity Build' : 'HTML Game'} Uploaded! You can now preview the game.</p>}
         </div>
     );
 }
