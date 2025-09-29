@@ -142,6 +142,7 @@ export default function LeaderBoard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Champion Showcase */}
+                    
                     <div className="lg:col-span-1">
                         <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
                             <div className="relative">
