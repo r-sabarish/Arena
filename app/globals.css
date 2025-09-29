@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 :root {
-  /* Modern Light Theme Colors - Neutral Palette Updated */
+  /* Light Theme Colors */
   --color-primary-50: #f8fafc;
   --color-primary-100: #f1f5f9;
   --color-primary-200: #e2e8f0;
@@ -50,14 +50,14 @@
 
   /* Light Theme Text */
   --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
+  --color-text-secondary: #334155;
   --color-text-muted: #64748b;
   --color-text-accent: #475569;
 
   /* Borders and Shadows */
   --color-border-light: #e2e8f0;
   --color-border-medium: #cbd5e1;
-  --color-border-accent: #64748b;
+  --color-border-accent: #94a3b8;
 
   /* Shadow Definitions */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -72,6 +72,126 @@
   --color-warning-bg: #fffbeb;
   --color-error: #ef4444;
   --color-error-bg: #fef2f2;
+}
+
+/* Dark Theme Colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary-50: #020617;
+    --color-primary-100: #0f172a;
+    --color-primary-200: #1e293b;
+    --color-primary-300: #334155;
+    --color-primary-400: #475569;
+    --color-primary-500: #64748b;
+    --color-primary-600: #94a3b8;
+    --color-primary-700: #cbd5e1;
+    --color-primary-800: #e2e8f0;
+    --color-primary-900: #f1f5f9;
+    --color-primary-950: #f8fafc;
+
+    --color-secondary-50: #020617;
+    --color-secondary-100: #0f172a;
+    --color-secondary-200: #1e293b;
+    --color-secondary-300: #334155;
+    --color-secondary-400: #475569;
+    --color-secondary-500: #64748b;
+    --color-secondary-600: #94a3b8;
+    --color-secondary-700: #cbd5e1;
+    --color-secondary-800: #e2e8f0;
+    --color-secondary-900: #f1f5f9;
+    --color-secondary-950: #f8fafc;
+
+    /* Dark Theme Backgrounds */
+    --color-background-primary: #0f172a;
+    --color-background-secondary: #1e293b;
+    --color-background-tertiary: #334155;
+    --color-background-card: #1e293b;
+    --color-background-muted: #334155;
+
+    /* Dark Theme Text */
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-accent: #64748b;
+
+    /* Dark Theme Borders */
+    --color-border-light: #334155;
+    --color-border-medium: #475569;
+    --color-border-accent: #64748b;
+
+    /* Dark Theme Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+
+    /* Dark Theme Success, Warning, Error Colors */
+    --color-success: #4ade80;
+    --color-success-bg: #14532d;
+    --color-warning: #fbbf24;
+    --color-warning-bg: #92400e;
+    --color-error: #f87171;
+    --color-error-bg: #991b1b;
+  }
+}
+
+/* Dark mode class for manual toggle */
+.dark {
+  --color-primary-50: #020617;
+  --color-primary-100: #0f172a;
+  --color-primary-200: #1e293b;
+  --color-primary-300: #334155;
+  --color-primary-400: #475569;
+  --color-primary-500: #64748b;
+  --color-primary-600: #94a3b8;
+  --color-primary-700: #cbd5e1;
+  --color-primary-800: #e2e8f0;
+  --color-primary-900: #f1f5f9;
+  --color-primary-950: #f8fafc;
+
+  --color-secondary-50: #020617;
+  --color-secondary-100: #0f172a;
+  --color-secondary-200: #1e293b;
+  --color-secondary-300: #334155;
+  --color-secondary-400: #475569;
+  --color-secondary-500: #64748b;
+  --color-secondary-600: #94a3b8;
+  --color-secondary-700: #cbd5e1;
+  --color-secondary-800: #e2e8f0;
+  --color-secondary-900: #f1f5f9;
+  --color-secondary-950: #f8fafc;
+
+  /* Dark Theme Backgrounds */
+  --color-background-primary: #0e0e0e;
+  --color-background-secondary: #2b2b2f;
+  --color-background-tertiary: #2d3032;
+  --color-background-card: #292626;
+  --color-background-muted: #3c3c47;
+
+  /* Dark Theme Text */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-accent: #64748b;
+
+  /* Dark Theme Borders */
+  --color-border-light: #334155;
+  --color-border-medium: #475569;
+  --color-border-accent: #64748b;
+
+  /* Dark Theme Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+
+  /* Dark Theme Success, Warning, Error Colors */
+  --color-success: #4ade80;
+  --color-success-bg: #14532d;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #92400e;
+  --color-error: #f87171;
+  --color-error-bg: #991b1b;
 }
 
 html,
@@ -120,11 +240,93 @@ a {
 
 /* Selection colors */
 ::selection {
-  background: var(--color-primary-100);
+  background: var(--color-accent-200);
   color: var(--color-text-primary);
 }
 
 ::-moz-selection {
-  background: var(--color-primary-100);
+  background: var(--color-accent-200);
   color: var(--color-text-primary);
+}
+
+/* Dark mode selection colors */
+@media (prefers-color-scheme: dark) {
+  ::selection {
+    background: var(--color-accent-700);
+    color: var(--color-text-primary);
+  }
+
+  ::-moz-selection {
+    background: var(--color-accent-700);
+    color: var(--color-text-primary);
+  }
+}
+
+.dark ::selection {
+  background: var(--color-accent-700);
+  color: var(--color-text-primary);
+}
+
+.dark ::-moz-selection {
+  background: var(--color-accent-700);
+  color: var(--color-text-primary);
+}
+
+/* Utility classes for theme-aware components */
+.bg-primary {
+  background-color: var(--color-background-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-background-secondary);
+}
+
+.bg-card {
+  background-color: var(--color-background-card);
+}
+
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.border-light {
+  border-color: var(--color-border-light);
+}
+
+.border-medium {
+  border-color: var(--color-border-medium);
+}
+
+.border-accent {
+  border-color: var(--color-border-accent);
+}
+
+/* Focus styles for better accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode specific focus styles */
+@media (prefers-color-scheme: dark) {
+  *:focus-visible {
+    outline-color: var(--color-accent-400);
+  }
+}
+
+.dark *:focus-visible {
+  outline-color: var(--color-accent-400);
 }

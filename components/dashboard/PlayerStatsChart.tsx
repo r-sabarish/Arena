@@ -27,9 +27,8 @@ export default function PlayerStatsChart({ gamesPlayed, trophies, loading }: Pla
             {
                 label: 'Player Statistics',
                 data: [gamesPlayed, trophies],
-                backgroundColor: ['rgba(59, 130, 246, 0.6)', 'rgba(16, 185, 129, 0.6)'], // Blue and Green with transparency
-                borderColor: ['#3b82f6', '#10b981'], // Solid colors for borders
-                borderWidth: 2,
+                backgroundColor: ['rgba(59, 130, 246, 0.6)', 'rgba(16, 185, 129, 0.6)'],
+                borderWidth: 0,
                 borderRadius: 8,
                 borderSkipped: false,
             },
@@ -107,13 +106,10 @@ export default function PlayerStatsChart({ gamesPlayed, trophies, loading }: Pla
 
     if (loading) {
         return (
-            <div className="bg-gradient-to-br from-purple-900/30 via-slate-800/40 to-indigo-900/30 backdrop-blur-sm border border-purple-500/20 rounded-lg p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20">
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-white">Player Statistics</h3>
-                    <div className="bg-purple-500/20 border border-purple-500/30 px-2 py-1 rounded-md">
-                        <span className="text-purple-300 font-medium text-xs">Loading...</span>
-                    </div>
-                </div>
+            <div className="bg-card rounded-lg p-4">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-primary">Player Statistics</h3>
+            </div>
                 <ChartSkeleton />
             </div>
         );
@@ -122,53 +118,50 @@ export default function PlayerStatsChart({ gamesPlayed, trophies, loading }: Pla
     const hasData = gamesPlayed > 0 || trophies > 0;
 
     return (
-        <div className="bg-gradient-to-br from-purple-900/30 via-slate-800/40 to-indigo-900/30 backdrop-blur-sm border border-purple-500/20 rounded-lg p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Player Statistics</h3>
-                <div className="bg-purple-500/20 border border-purple-500/30 px-2 py-1 rounded-md">
-                    <span className="text-purple-300 font-medium text-xs">Games & Trophies</span>
-                </div>
+        <div className="bg-gradient-to-br from-orange-50 to-red-100 dark:from-orange-900/30 dark:to-red-800/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-primary">Player Statistics</h3>
             </div>
             
             {!hasData ? (
-                <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <span className="text-lg font-bold text-slate-500 dark:text-slate-400">STATS</span>
-                    </div>
-                    <p className="text-slate-700 dark:text-slate-300 font-medium text-sm">No statistics yet</p>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs">Start playing games to see your progress</p>
+                    <div className="text-center py-8">
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-3 shadow-md">
+                            <span className="text-white text-lg font-bold">STATS</span>
+                        </div>
+                    <p className="text-secondary font-medium text-sm">No statistics yet</p>
+                    <p className="text-muted text-xs">Start playing games to see your progress</p>
                 </div>
             ) : (
                 <div>
                     {/* Chart Container */}
-                    <div className="relative h-32 mb-2">
+                    <div className="relative h-40 mb-4">
                         <Bar data={chartData} options={chartOptions} />
                     </div>
 
                     {/* Statistics Summary Cards */}
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center border border-blue-200 dark:border-blue-700">
-                            <div className="w-3 h-3 bg-blue-500 rounded-full mx-auto mb-1"></div>
-                            <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Games Played</p>
-                            <p className="text-lg font-bold text-blue-900 dark:text-blue-100">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-white to-orange-50 dark:from-gray-800 dark:to-orange-900/20 rounded-lg p-3 text-center shadow-md">
+                            <div className="w-4 h-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mx-auto mb-2"></div>
+                            <p className="text-sm font-medium text-secondary mb-2">Games Played</p>
+                            <p className="text-xl font-bold text-primary">
                                 {gamesPlayed.toLocaleString()}
                             </p>
                         </div>
                         
-                        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 text-center border border-green-200 dark:border-green-700">
-                            <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
-                            <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">Trophies</p>
-                            <p className="text-lg font-bold text-green-900 dark:text-green-100">
+                        <div className="bg-gradient-to-br from-white to-red-50 dark:from-gray-800 dark:to-red-900/20 rounded-lg p-3 text-center shadow-md">
+                            <div className="w-4 h-4 bg-gradient-to-br from-red-500 to-pink-500 rounded-full mx-auto mb-2"></div>
+                            <p className="text-sm font-medium text-secondary mb-2">Trophies</p>
+                            <p className="text-xl font-bold text-primary">
                                 {trophies.toLocaleString()}
                             </p>
                         </div>
                     </div>
 
                     {/* Total Summary */}
-                    <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">
+                    <div className="mt-4 pt-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-slate-600 dark:text-slate-400 text-xs">Total Achievement Score:</span>
-                            <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                            <span className="text-muted text-sm">Total Achievement Score:</span>
+                            <span className="font-bold text-primary text-base">
                                 {(gamesPlayed + trophies).toLocaleString()}
                             </span>
                         </div>

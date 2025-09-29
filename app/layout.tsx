@@ -38,12 +38,9 @@ export default async function RootLayout({
           <UnitySessionProvider>
             <PlayTimeProvider>
               <PlayTimer />
-               <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-slate-900 transition-colors duration-300 relative overflow-hidden">
-                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(139,92,246,0.1)_0%,transparent_60%)]"></div>
-                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(59,130,246,0.08)_0%,transparent_60%)]"></div>
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+              <div className="flex min-h-screen bg-background-primary transition-colors duration-300">
                 <SideBar />
-                <main className="flex-1 pl-20 overflow-y-auto">
+                <main className="flex-1 pl-20 min-h-screen">
                   {children}
                 </main>
               </div>

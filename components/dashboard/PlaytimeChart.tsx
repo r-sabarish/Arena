@@ -60,10 +60,10 @@ export default function PlaytimeChart({ playtimeSeconds, totalSeconds, loading }
     };
 
     return (
-        <div className="bg-gradient-to-br from-blue-900/30 via-slate-800/40 to-cyan-900/30 backdrop-blur-sm border border-blue-500/20 rounded-lg p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-white">Playtime Analytics</h3>
-                <div className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded-full border border-blue-500/30">
+        <div className="bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/30 dark:to-blue-800/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-primary">Playtime Analytics</h3>
+                <div className="px-3 py-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-sm font-medium rounded-full shadow-sm">
                     Daily Limit: {Math.floor(totalSeconds / 60)}min
                 </div>
             </div>
@@ -85,30 +85,30 @@ export default function PlaytimeChart({ playtimeSeconds, totalSeconds, loading }
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col lg:flex-row items-center justify-between">
-                    <div className="w-24 h-24 mb-2 lg:mb-0">
+                <div className="flex flex-col lg:flex-column items-center">
+                    <div className="w-32 h-32 mb-4">
                         <Doughnut data={playtimeData} options={options} />
                     </div>
-                    <div className="lg:ml-3 space-y-2">
+                    <div className="lg:ml-6 space-y-3">
                         <div className="space-y-1">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
+                            <div className="flex items-center space-x-3">
+                                <div className="w-4 h-4 bg-slate-500 rounded-full"></div>
                                 <div>
-                                    <span className="text-slate-900 font-medium text-sm">Played: {Math.floor(playtimeSeconds / 60)}min</span>
-                                    <p className="text-slate-500 text-xs">{playtimeSeconds} seconds</p>
+                                    <span className="text-primary font-medium text-base">Played: {Math.floor(playtimeSeconds / 60)}min</span>
+                                    <p className="text-muted text-sm">{playtimeSeconds} seconds</p>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <div className="w-3 h-3 bg-slate-300 rounded-full"></div>
+                            <div className="flex items-center space-x-3">
+                                <div className="w-4 h-4 bg-slate-300 rounded-full"></div>
                                 <div>
-                                    <span className="text-slate-900 font-medium text-sm">Remaining: {Math.floor((totalSeconds - playtimeSeconds) / 60)}min</span>
-                                    <p className="text-slate-500 text-xs">{totalSeconds - playtimeSeconds} seconds</p>
+                                    <span className="text-primary font-medium text-base">Remaining: {Math.floor((totalSeconds - playtimeSeconds) / 60)}min</span>
+                                    <p className="text-muted text-sm">{totalSeconds - playtimeSeconds} seconds</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                            <p className="text-slate-600 text-xs">
-                                You've used <span className="font-semibold text-slate-700">{Math.round((playtimeSeconds / totalSeconds) * 100)}%</span> of your daily playtime
+                            <div className="bg-gradient-to-r from-white to-cyan-50 dark:from-gray-800 dark:to-cyan-900/20 p-4 rounded-lg shadow-md">
+                            <p className="text-muted text-sm">
+                                You've used <span className="font-semibold text-secondary">{Math.round((playtimeSeconds / totalSeconds) * 100)}%</span> of your daily playtime
                             </p>
                         </div>
                     </div>

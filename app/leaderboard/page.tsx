@@ -8,6 +8,7 @@ import {
     playFabLoginWithAzureAD,
 } from '@/lib/playfab/playfab';
 import dynamic from 'next/dynamic';
+import LeaderboardChart from '@/components/dashboard/LeaderboardChart';
 
 const Model = dynamic(() => import('@/components/Model'), {
     ssr: false,
@@ -96,31 +97,15 @@ export default function LeaderBoard() {
             (b[sortFieldMap[sortBy]] as number) - (a[sortFieldMap[sortBy]] as number)
     );
 
-    const getRankIcon = (rank: number) => {
-        switch (rank) {
-            case 1: return '1st';
-            case 2: return '2nd';
-            case 3: return '3rd';
-            default: return `#${rank}`;
-        }
-    };
-
-    const getRankStyle = (rank: number) => {
-        switch (rank) {
-            case 1: return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white';
-            case 2: return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white';
-            case 3: return 'bg-gradient-to-r from-orange-400 to-orange-600 text-white';
-            default: return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
-        }
-    };
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center transition-colors duration-300">
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8 border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-slate-700 dark:text-slate-300 font-medium">Loading Leaderboard...</span>
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
+                <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-12 shadow-2xl">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl"></div>
+                    <div className="relative flex items-center space-x-4">
+                        <div className="w-8 h-8 border-4 border-gradient-to-r from-blue-500 to-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-white font-medium text-lg">Loading Leaderboard...</span>
                     </div>
                 </div>
             </div>
@@ -132,17 +117,21 @@ export default function LeaderBoard() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
             {/* Header */}
-            <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Leaderboard</h1>
-                            <p className="text-slate-600 dark:text-slate-400 mt-2">Weekly competition rankings</p>
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+                                Leaderboard
+                            </h1>
+                            <p className="text-slate-300 mt-2 text-base">Weekly competition rankings</p>
                         </div>
-                        <div>
-                            <span className="inline-block bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full animate-pulse"></div>
+                            <span className="inline-block bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium border border-purple-500/30">
                                 Top Players
                             </span>
                         </div>
@@ -154,132 +143,99 @@ export default function LeaderBoard() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Champion Showcase */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors duration-300">
-                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 text-center">
-                                Current Champion
-                            </h2>
-                            
-                            {leaders[0] ? (
-                                <div className="text-center">
-                                    {/* 3D Model */}
-                                    <div className="h-64 mb-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 rounded-lg overflow-hidden">
-                                        <Model name={leaders[0].name.split(' ')[0]} />
-                                    </div>
-                                    
-                                    <div className="space-y-2">
-                                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                                            {leaders[0].name}
-                                        </h3>
-                                        <div className="flex justify-center space-x-4 text-sm">
-                                            <div className="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-3 py-1 rounded-full">
-                                                {leaders[0].trophies} trophies
-                                            </div>
-                                            <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">
-                                                {leaders[0].gamesPlayed} games
+                        <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
+                            <div className="relative">
+                                
+                                {leaders[0] ? (
+                                    <div className="text-center">
+                                        {/* 3D Model */}
+                                        <div className="relative h-96 bg-gradient-to-b from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-inner">
+                                            <div className="relative h-full">
+                                                <Model name={leaders[0].name.split(' ')[0]} />
                                             </div>
                                         </div>
+                                        
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="text-center py-8">
-                                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <span className="text-xl font-bold">1st</span>
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <div className="w-20 h-20 bg-gradient-to-r from-slate-700 to-slate-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                            <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        </div>
+                                        <p className="text-slate-400">No champion yet</p>
                                     </div>
-                                    <p className="text-slate-500 dark:text-slate-400">No champion yet</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Leaderboard Table */}
+                    {/* Leaderboard Chart */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors duration-300">
-                            {/* Controls */}
-                            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 sm:mb-0">
-                                        Rankings
+                        {/* Controls */}
+                        <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-6 mb-6 shadow-2xl">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-2xl"></div>
+                            <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex items-center mb-4 sm:mb-0">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-lg">
+                                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                                        </svg>
+                                    </div>
+                                    <h2 className="text-xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
+                                        Rankings Visualization
                                     </h2>
-                                    <div className="flex items-center space-x-3">
-                                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                            Sort by:
-                                        </label>
-                                        <select
-                                            value={sortBy}
-                                            onChange={(e) => setSortBy(e.target.value as SortOption)}
-                                            className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors duration-200"
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <label className="text-sm font-medium text-slate-300">
+                                        View by:
+                                    </label>
+                                    <div className="flex bg-slate-700/50 backdrop-blur-sm rounded-xl p-1">
+                                        <button
+                                            onClick={() => setSortBy('Trophies')}
+                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                                                sortBy === 'Trophies'
+                                                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg'
+                                                    : 'text-slate-400 hover:text-white hover:bg-slate-600/50'
+                                            }`}
                                         >
-                                            <option value="Trophies">Trophies</option>
-                                            <option value="Games Played">Games Played</option>
-                                        </select>
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                            <span>Trophies</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setSortBy('Games Played')}
+                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                                                sortBy === 'Games Played'
+                                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                                                    : 'text-slate-400 hover:text-white hover:bg-slate-600/50'
+                                            }`}
+                                        >
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                                            </svg>
+                                            <span>Games Played</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Table */}
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="border-b border-slate-200 dark:border-slate-700">
-                                            <th className="text-left py-4 px-6 font-medium text-slate-900 dark:text-slate-100">Rank</th>
-                                            <th className="text-left py-4 px-6 font-medium text-slate-900 dark:text-slate-100">Player</th>
-                                            <th className="text-left py-4 px-6 font-medium text-slate-900 dark:text-slate-100">{sortBy}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {loading ? (
-                                            [...Array(5)].map((_, i) => (
-                                                <tr key={i} className="border-b border-slate-100 dark:border-slate-700">
-                                                    <td className="py-4 px-6">
-                                                        <div className="w-8 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="w-32 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : sortedLeaders.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={3} className="py-12 text-center">
-                                                    <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                        <span className="text-lg font-bold">Stats</span>
-                                                    </div>
-                                                    <p className="text-slate-500 dark:text-slate-400">No leaderboard data available</p>
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            sortedLeaders.map((player, index) => (
-                                                <tr key={player.rank} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-200">
-                                                    <td className="py-4 px-6">
-                                                        <div className={`inline-flex items-center justify-center w-10 h-8 rounded-lg font-bold text-sm ${getRankStyle(player.rank)}`}>
-                                                            {getRankIcon(player.rank)}
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <div className="flex items-center space-x-3">
-                                                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                                                {player.name.charAt(0).toUpperCase()}
-                                                            </div>
-                                                            <span className="font-medium text-slate-900 dark:text-slate-100">
-                                                                {player.name}
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-6">
-                                                        <span className="font-semibold text-slate-900 dark:text-slate-100">
-                                                            {player[sortFieldMap[sortBy]].toLocaleString()}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
+
+                        {/* Chart */}
+                        {loading ? (
+                            <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-6 shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-2xl"></div>
+                                <div className="relative h-96 flex items-center justify-center">
+                                    <div className="text-center">
+                                        <div className="w-12 h-12 border-4 border-gradient-to-r from-blue-500 to-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                        <p className="text-slate-300 text-lg">Loading chart...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <LeaderboardChart players={sortedLeaders} sortBy={sortBy} />
+                        )}
                     </div>
                 </div>
             </div>

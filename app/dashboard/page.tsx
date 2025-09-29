@@ -235,10 +235,10 @@ export default function Dashboard() {
 
     if (status === 'loading') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 flex items-center justify-center">
+            <div className="min-h-screen bg-background-primary flex items-center justify-center">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-slate-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-slate-700 text-lg font-medium">Loading your arena...</p>
+                    <div className="w-16 h-16 bg-muted animate-spin mx-auto mb-4"></div>
+                    <p className="text-primary text-lg font-medium">Loading your arena...</p>
                 </div>
             </div>
         );
@@ -479,10 +479,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-slate-900 transition-colors duration-300 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(139,92,246,0.1)_0%,transparent_60%)]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(59,130,246,0.08)_0%,transparent_60%)]"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+        <div className="min-h-screen bg-background-primary transition-colors duration-300">
             {popup && (
                 <Popup
                     message={popup.message}
@@ -493,7 +490,7 @@ export default function Dashboard() {
 
 
             {/* Hero Section */}
-            <div className="relative z-10">
+            <div>
                 <HeroSection
                     tagline={tagline}
                     playFabId={playFabId}
@@ -503,29 +500,25 @@ export default function Dashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="relative z-10 max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 pb-2">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
                 {error && (
-                    <div className="mb-2 bg-red-900/20 border border-red-500/30 text-red-300 px-2 py-1 rounded-lg shadow-lg backdrop-blur-sm">
-                        <div className="flex items-center space-x-2">
-                            <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="mb-4 bg-error text-text-primary px-4 py-3 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                            <svg className="w-5 h-5 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
-                            <span className="font-medium text-xs text-red-200">Error: {error}</span>
+                            <span className="font-medium text-sm text-text-primary">Error: {error}</span>
                         </div>
                     </div>
                 )}
 
 
-                {/* Player Statistics Chart */}
-                <div className="mb-2">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                     <PlayerStatsChart
                         gamesPlayed={parseInt(playerStats.find(s => ['Games Played', 'GamesPlayed', 'Games', 'TotalGames', 'GameCount', 'Matches', 'MatchesPlayed'].includes(s.StatisticName))?.Value || '0')}
                         trophies={parseInt(playerStats.find(s => ['Trophies', 'Achievements', 'Awards'].includes(s.StatisticName))?.Value || '0')}
                         loading={loading}
                     />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-2">
                     {/* Playtime Chart */}
                     <PlaytimeChart
                         playtimeSeconds={playtimeSeconds}
@@ -540,14 +533,8 @@ export default function Dashboard() {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-2">
-                    {/* Inventory */}
-                    <Inventory
-                        inventoryItems={inventoryItems}
-                        loading={loading}
-                        onUseItem={handleUseInventoryItem}
-                        isBuying={isBuying}
-                    />
+                {/* Content Grid */}
+                <div className="mt-4">
 
                     {/* Golden Tickets */}
                     <GoldenTickets
@@ -561,18 +548,32 @@ export default function Dashboard() {
                         loading={loading}
                         onRedeem={handleRedeemCoupon}
                     />
+
                 </div>
 
-                {/* Content Grid */}
-                <div className="mt-2">
-                    {/* Store */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+
                     <Store
                         storeItems={storeItems}
                         loading={loading}
                         virtualCurrency={virtualCurrency}
                         onPurchase={handlePurchaseItem}
                     />
+                    
+                    {/* Inventory */}
+                    <Inventory
+                        inventoryItems={inventoryItems}
+                        loading={loading}
+                        onUseItem={handleUseInventoryItem}
+                        isBuying={isBuying}
+                    />
+
+
+
+
                 </div>
+
+
 
             </div>
         </div>

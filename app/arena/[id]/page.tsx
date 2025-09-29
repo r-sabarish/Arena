@@ -61,9 +61,9 @@ export default function GameDetailPage() {
 
     if (status === 'loading' || loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
+            <div className="min-h-screen bg-background-primary transition-colors duration-300">
                 {/* Header Skeleton */}
-                <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 transition-colors duration-300">
+                <div className="bg-card border-b border-border-light transition-colors duration-300">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                         <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/3 animate-pulse"></div>
                         <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/4 mt-2 animate-pulse"></div>
@@ -104,13 +104,13 @@ export default function GameDetailPage() {
 
     if (!game) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center transition-colors duration-300">
+            <div className="min-h-screen bg-background-primary flex items-center justify-center transition-colors duration-300">
                 <div className="text-center">
-                    <div className="w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
                         <span className="text-4xl">😞</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Game Not Found</h2>
-                    <p className="text-slate-600 dark:text-slate-400 mb-8">The game you're looking for doesn't exist or may have been removed.</p>
+                    <h2 className="text-2xl font-bold text-primary mb-4">Game Not Found</h2>
+                    <p className="text-secondary mb-8">The game you're looking for doesn't exist or may have been removed.</p>
                     <button
                         onClick={() => router.push('/arena')}
                         className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
@@ -123,7 +123,7 @@ export default function GameDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
+        <div className="min-h-screen bg-background-primary transition-colors duration-300">
             {/* Popup */}
             {popup && (
                 <Popup
@@ -134,17 +134,17 @@ export default function GameDetailPage() {
             )}
 
             {/* Header */}
-            <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 transition-colors duration-300">
+            <div className="bg-gradient-to-r from-slate-900/80 to-gray-900/80 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{game.title}</h1>
-                            <p className="text-slate-600 dark:text-slate-400 mt-2">by {game.publisher}</p>
+                            <h1 className="text-3xl font-bold text-white">{game.title}</h1>
+                            <p className="text-gray-300 mt-2">by {game.publisher}</p>
                         </div>
                         <div className="flex items-center space-x-3">
                             <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${game.type === 'unity'
-                                    ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
-                                    : 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300'
+                                ? 'bg-white/20 text-white backdrop-blur-sm'
+                                : 'bg-white/20 text-white backdrop-blur-sm'
                                 }`}>
                                 {game.type === 'unity' ? 'Unity WebGL' : 'HTML Game'}
                             </span>
@@ -157,7 +157,7 @@ export default function GameDetailPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Media Preview */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors duration-300">
+                        <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-colors duration-300">
                             <div className="aspect-video bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden mb-4">
                                 {activeIndex < game.image.length ? (
                                     <img
@@ -189,8 +189,8 @@ export default function GameDetailPage() {
                                     <button
                                         key={`img-${index}`}
                                         className={`w-3 h-3 rounded-full transition-colors duration-200 ${activeIndex === index
-                                                ? 'bg-blue-500'
-                                                : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
+                                            ? 'bg-blue-500'
+                                            : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
                                             }`}
                                         onClick={() => setActiveIndex(index)}
                                     />
@@ -199,61 +199,41 @@ export default function GameDetailPage() {
                                     <button
                                         key="video"
                                         className={`w-3 h-3 rounded-full transition-colors duration-200 ${activeIndex === game.image.length
-                                                ? 'bg-blue-500'
-                                                : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
+                                            ? 'bg-blue-500'
+                                            : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
                                             }`}
                                         onClick={() => setActiveIndex(game.image.length)}
                                     />
                                 )}
                             </div>
 
-                            {/* Game Description */}
-                            <div>
-                                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">Description</h2>
-                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{game.description}</p>
-                            </div>
+                             {/* Game Description */}
+                             <div>
+                                 <h2 className="text-lg font-semibold text-white mb-3">Description</h2>
+                                 <p className="text-gray-300 leading-relaxed">{game.description}</p>
+                             </div>
                         </div>
                     </div>
 
                     {/* Game Details Sidebar */}
                     <div className="space-y-6">
-                        {/* Play Button */}
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors duration-300">
-                            <button
-                                onClick={handleOnClickPlay}
-                                disabled={isExpired}
-                                className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${isExpired
-                                        ? 'bg-red-500 hover:bg-red-600 text-white cursor-not-allowed opacity-75'
-                                        : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
-                                    }`}
-                            >
-                                {isExpired ? 'Playtime Expired' : 'Play Now'}
-                            </button>
-
-                            <button
-                                onClick={() => router.push('/arena')}
-                                className="w-full mt-3 py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors duration-200"
-                            >
-                                ← Back to Arena
-                            </button>
-                        </div>
 
                         {/* Game Details */}
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors duration-300">
-                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Game Details</h2>
+                        <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-colors duration-300">
+                            <h2 className="text-lg font-semibold text-white mb-4">Game Details</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Details</h3>
-                                    <p className="text-slate-700 dark:text-slate-300">{game.details}</p>
+                                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-1">Details</h3>
+                                    <p className="text-gray-300">{game.details}</p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Categories</h3>
+                                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">Categories</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {game.category.map((cat, index) => (
                                             <span
                                                 key={index}
-                                                className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium"
+                                                className="inline-block bg-gray-700/50 backdrop-blur-sm text-gray-300 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
                                             >
                                                 {cat}
                                             </span>
@@ -261,11 +241,28 @@ export default function GameDetailPage() {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Publisher</h3>
-                                    <p className="text-slate-700 dark:text-slate-300 font-medium">{game.publisher}</p>
-                                </div>
                             </div>
+                        </div>
+
+                        {/* Play Button */}
+                        <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-colors duration-300">
+                            <button
+                                onClick={handleOnClickPlay}
+                                disabled={isExpired}
+                                className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${isExpired
+                                    ? 'bg-red-600 hover:bg-red-700 text-white cursor-not-allowed opacity-75'
+                                    : 'bg-green-600 hover:bg-green-700 text-white'
+                                    }`}
+                            >
+                                {isExpired ? 'Playtime Expired' : 'Play ❌ '}
+                            </button>
+
+                            <button
+                                onClick={() => router.push('/arena')}
+                                className="w-full mt-3 py-3 bg-gray-700/50 backdrop-blur-sm hover:bg-gray-600/50 text-gray-300 rounded-lg font-medium transition-all duration-200 shadow-sm"
+                            >
+                                Back ⭕
+                            </button>
                         </div>
                     </div>
                 </div>
