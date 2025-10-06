@@ -58,13 +58,15 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Screenshots
 
-![image](https://github.com/user-attachments/assets/c8d7ec0e-c67f-4a9b-ba82-b7c73934a8e5)
+<img width="1358" height="608" alt="image" src="https://github.com/user-attachments/assets/7160618d-daba-45de-b81c-827db4936ca4" />
+<img width="1353" height="604" alt="image" src="https://github.com/user-attachments/assets/210aff68-1345-4e4c-bfcd-9177b68302ff" />
 ![image](https://github.com/user-attachments/assets/a7202786-5262-4267-a1ed-8b2f2778980d)
 ![image](https://github.com/user-attachments/assets/7c77d995-3960-45d0-ac10-fe2a784e57ba)
 ![image](https://github.com/user-attachments/assets/cc9b159a-ead4-44c4-bef4-520078eb4514)
 ![image](https://github.com/user-attachments/assets/5fdc2fa0-70c0-4d63-bafa-9b850a598cf1)
 ![image](https://github.com/user-attachments/assets/087292dd-c786-49ad-b164-157e2d1ace73)
 ![image](https://github.com/user-attachments/assets/8e731e1e-e22a-4b4a-9ef3-fd0858d72b62)
+<img width="1358" height="607" alt="image" src="https://github.com/user-attachments/assets/7737c024-4e62-4ef8-80b7-b4cc6f42d8b6" />
 
 
 
