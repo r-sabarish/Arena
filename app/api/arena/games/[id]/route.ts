@@ -3,10 +3,11 @@ import { getGameById } from '@/lib/db';
 
 export async function GET(
     req: Request,
-    context: Promise<{ params: { id: string } }>
+    context: Promise<{ params: Promise<{ id: string }> }>
 ) {
     try {
-        const { id } = (await context).params;
+        const params = await context;
+        const { id } = await params.params;
         const gameId = parseInt(id);
 
         if (isNaN(gameId)) {

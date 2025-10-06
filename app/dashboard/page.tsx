@@ -2,45 +2,38 @@
 
 import { useSession } from 'next-auth/react';
 import SignIn from '@/components/auth/SignIn';
-import styles from './dashboard.module.css';
 import { useEffect, useState, useRef } from 'react';
 import {
     playFabLoginWithAzureAD,
     getUserDataFromPlayFab,
-    getPlayerStatistics,
     getUserInventory,
-    getFriendsList,
     getStoreItems,
     purchaseStoreItem,
     useInventoryItem,
-    updatePlayFabUserData
+    updatePlayFabUserData,
+    getPlayerStatistics,
 } from '@/lib/playfab/playfab';
 import { generateCouponCode } from '@/lib/ticket/ticket';
-import { Bar, Pie } from 'react-chartjs-2';
 import Popup from '../../components/popup/Popup';
 import { useRouter } from 'next/navigation';
 
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement,
-} from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
+// Dashboard Components
+import HeroSection from '@/components/dashboard/HeroSection';
+import PlaytimeChart from '@/components/dashboard/PlaytimeChart';
+import Inventory from '@/components/dashboard/Inventory';
+import Store from '@/components/dashboard/Store';
+import GoldenTickets from '@/components/dashboard/GoldenTickets';
+import VirtualCurrencies from '@/components/dashboard/VirtualCurrencies';
+import PlayerStatsChart from '@/components/dashboard/PlayerStatsChart';
 
 const titleId = process.env.NEXT_PUBLIC_PLAYFAB_TITLE_ID ?? '';
 
 interface PlayerStat {
     StatisticName: string;
-    Value: number;
+    Value: string;
     Version?: number;
 }
+
 
 interface UserDataRecord {
     Value: string;
@@ -58,11 +51,6 @@ interface InventoryItem {
     RemainingUses?: number;
 }
 
-interface Friend {
-    FriendPlayFabId: string;
-    Username?: string;
-    TitleDisplayName?: string;
-}
 
 interface StoreItem {
     ItemId: string;
@@ -70,7 +58,6 @@ interface StoreItem {
     CatalogVersion?: string;
     VirtualCurrencyPrices?: { [currencyCode: string]: number };
 }
-
 
 const arenaTaglines = [
     "The Ultimate Coffee Break Showdown",
@@ -99,8 +86,6 @@ export default function Dashboard() {
     const [virtualCurrency, setVirtualCurrency] = useState<VirtualCurrency>({});
     const [userData, setUserData] = useState<Record<string, string>>({});
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-    const [friends, setFriends] = useState<Friend[]>([]);
-    const [friendAddStatus, setFriendAddStatus] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [sessionTicket, setSessionTicket] = useState<string | null>(null);
@@ -112,11 +97,8 @@ export default function Dashboard() {
     const [popup, setPopup] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
     const popupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-
     const catalogVersion = '1';
     const storeId = 'Ticket Store';
-
-
 
     useEffect(() => {
         if (status !== 'authenticated' || !session) return;
@@ -127,7 +109,6 @@ export default function Dashboard() {
         const loginAndLoadData = async () => {
             setLoading(true);
             setError(null);
-            setFriendAddStatus(null);
 
             try {
                 let _sessionTicket = null;
@@ -169,7 +150,6 @@ export default function Dashboard() {
                     }
                 }
 
-
                 setPlayFabId(_playFabId);
                 setSessionTicket(_sessionTicket);
 
@@ -191,11 +171,12 @@ export default function Dashboard() {
                     await handleUnAuthorized(userDataRes.error, loginAndLoadData);
                 }
 
-
-                // Player Stats
+                // Player Statistics
                 const statsRes = await getPlayerStatistics(_sessionTicket, titleId);
                 if (statsRes.data?.Statistics) {
                     setPlayerStats(statsRes.data.Statistics);
+                } else {
+                    setPlayerStats([]); // Set empty array if no stats
                 }
 
                 // Inventory & Virtual Currency
@@ -205,18 +186,12 @@ export default function Dashboard() {
                     setInventoryItems(inventoryRes.data.Inventory || []);
                 }
 
-                // Friends
-                const friendsRes = await getFriendsList(_sessionTicket, titleId);
-                if (friendsRes.data?.Friends) {
-                    setFriends(friendsRes.data.Friends);
-                }
 
                 // Store
                 const storeRes = await getStoreItems(_sessionTicket, titleId, storeId, catalogVersion);
                 if (storeRes.data?.Store) {
                     setStoreItems(storeRes.data.Store);
                 }
-
 
             } catch (err: any) {
                 console.log("UnAuthorized !");
@@ -259,7 +234,14 @@ export default function Dashboard() {
     }
 
     if (status === 'loading') {
-        return <div className={styles.page}>Loading session...</div>;
+        return (
+            <div className="min-h-screen bg-background-primary flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-16 h-16 bg-muted animate-spin mx-auto mb-4"></div>
+                    <p className="text-primary text-lg font-medium">Loading your arena...</p>
+                </div>
+            </div>
+        );
     }
 
     if (!session) {
@@ -274,136 +256,9 @@ export default function Dashboard() {
         });
     };
 
-    const playerStatsChartData = {
-        labels: playerStats.map((stat) => stat.StatisticName),
-        datasets: [
-            {
-                label: 'Value',
-                data: playerStats.map((stat) => stat.Value),
-                backgroundColor: [
-                    '#ff073a',
-                    '#2655FF',
-                ],
-                borderColor: [
-                    '#ffff',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
-
-
     const totalSeconds = parseInt(process.env.NEXT_PUBLIC_DAILY_PLAYTIME_LIMIT || '0');
-
     const playtimeSecondsStr = userData.playtime_seconds || '0';
     const playtimeSeconds = parseInt(playtimeSecondsStr, 10) || 0;
-
-    const data = {
-        labels: ['Played', 'Remaining'],
-        datasets: [
-            {
-                data: [playtimeSeconds, totalSeconds - playtimeSeconds],
-                backgroundColor: ['#1a73e8', '#e0e0e0'],
-                borderWidth: 0,
-                cutout: '80%',
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        cutout: '80%',
-        plugins: {
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (context: any) {
-                        const label = context.label || '';
-                        const value = context.parsed || 0;
-                        if (label === 'Played') {
-                            return `${label}: ${value} sec (${Math.floor(value / 60)} min)`;
-                        }
-                        if (label === 'Remaining') {
-                            return `${label}: ${value} sec (${Math.floor(value / 60)} min)`;
-                        }
-                        return `${label}: ${value}`;
-                    },
-                },
-            },
-        },
-    };
-
-
-
-
-    const virtualCurrencyLabels = Object.keys(virtualCurrency);
-    const virtualCurrencyValues = Object.values(virtualCurrency);
-    const virtualCurrencyChartData = {
-        labels: virtualCurrencyLabels,
-        datasets: [
-            {
-                label: 'Arena Economy',
-                data: virtualCurrencyValues,
-                backgroundColor: [
-                    '#FFB22C',
-                    '#ff073a',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
-
-    const StatisticNameWithEmoji = (name: string): string => {
-        let prefix: string;
-        switch (name) {
-            case "Games Played":
-                prefix = "🎲 "
-                break;
-            case "Trophies":
-                prefix = "🏆 ";
-                break;
-            default:
-                prefix = ""
-                break;
-        }
-        return prefix + name;
-    }
-
-    const handleBuyStoreItem = async (item: StoreItem, price: number, selectedCurrency: string) => {
-        if (!sessionTicket) return;
-        setIsBuying(true);
-
-        try {
-            const res = await purchaseStoreItem(
-                sessionTicket,
-                titleId,
-                storeId,
-                catalogVersion,
-                item.ItemId,
-                price,
-                selectedCurrency
-            );
-
-            if (res?.error) {
-                showPopup(`Purchase failed: ${res.errorMessage || 'Unknown error'}`, 'error');
-            } else {
-                showPopup(`Purchased ${item.DisplayName || item.ItemId} with ${selectedCurrency}!`, 'success');
-
-                const refreshedInventory = await getUserInventory(sessionTicket, titleId);
-                if (refreshedInventory?.data) {
-                    setInventoryItems(refreshedInventory.data.Inventory || []);
-                    setVirtualCurrency(refreshedInventory.data.VirtualCurrency || {});
-                }
-            }
-        } catch (err) {
-            showPopup('Purchase failed due to a network or unexpected error.', 'error');
-            console.error(err);
-        } finally {
-            setIsBuying(false);
-        }
-    };
 
     const handleUseInventoryItem = async (item: InventoryItem) => {
         if (!sessionTicket) return;
@@ -451,8 +306,180 @@ export default function Dashboard() {
         popupTimeoutRef.current = setTimeout(() => setPopup(null), 3000);
     };
 
+    const handleRedeemCoupon = async (coupon: string) => {
+        try {
+            showPopup(`Redeeming golden ticket: ${coupon}`, 'success');
+
+            // Here you would typically send the coupon to your backend for processing
+            // For now, we'll just remove it from the local state
+            let coupons: string[] = [];
+            try {
+                coupons = userData.Coupons ? JSON.parse(userData.Coupons) : [];
+            } catch {
+                coupons = [];
+            }
+
+            // Remove the redeemed coupon
+            const updatedCoupons = coupons.filter(c => c !== coupon);
+
+            if (sessionTicket) {
+                await updatePlayFabUserData(sessionTicket, titleId, {
+                    Coupons: JSON.stringify(updatedCoupons)
+                });
+
+                // Update local state
+                setUserData((prev) => ({
+                    ...prev,
+                    Coupons: JSON.stringify(updatedCoupons)
+                }));
+            }
+
+            showPopup(`Golden ticket redeemed successfully! Check your email for details.`, 'success');
+        } catch (error) {
+            showPopup('Failed to redeem golden ticket. Please try again.', 'error');
+            console.error('Redeem error:', error);
+        }
+    };
+
+
+    const handlePurchaseItem = async (item: any, currency: string) => {
+        if (!sessionTicket) {
+            showPopup('Please log in to make purchases.', 'error');
+            return;
+        }
+
+        try {
+            setIsBuying(true);
+            console.log('Starting purchase process:', {
+                item: item.ItemId,
+                displayName: item.DisplayName,
+                currency,
+                storeId,
+                catalogVersion
+            });
+
+            showPopup(`Purchasing ${item.DisplayName || item.ItemId} with ${currency}...`, 'success');
+
+            // Calculate the price in the selected currency
+            const originalPrice = item.VirtualCurrencyPrices ? Object.values(item.VirtualCurrencyPrices)[0] || 0 : 0;
+            const originalCurrency = item.VirtualCurrencyPrices ? Object.keys(item.VirtualCurrencyPrices)[0] || 'AC' : 'AC';
+
+            console.log('Item price details:', {
+                itemId: item.ItemId,
+                virtualCurrencyPrices: item.VirtualCurrencyPrices,
+                originalPrice,
+                originalCurrency,
+                selectedCurrency: currency
+            });
+
+            let finalPrice = originalPrice;
+            let actualCurrency = currency;
+
+            // Check if the item actually supports the selected currency
+            if (item.VirtualCurrencyPrices && !item.VirtualCurrencyPrices[currency]) {
+                console.log('Item does not support selected currency, using conversion...');
+
+                // Apply conversion rate (you can customize these rates)
+                const conversionRates: { [key: string]: number } = {
+                    'AC': 1, 'GC': 0.1, 'TC': 5, 'SC': 1.5, 'BC': 2, 'PC': 0.05
+                };
+                const originalRate = Number(conversionRates[originalCurrency]) || 1;
+                const targetRate = Number(conversionRates[currency]) || 1;
+                const numericOriginalPrice = typeof originalPrice === 'number' ? originalPrice : Number(originalPrice) || 0;
+                finalPrice = Math.ceil(numericOriginalPrice * (originalRate / targetRate));
+
+                console.log('Currency conversion:', {
+                    originalPrice,
+                    originalCurrency,
+                    targetCurrency: currency,
+                    originalRate,
+                    targetRate,
+                    finalPrice
+                });
+            } else if (item.VirtualCurrencyPrices && item.VirtualCurrencyPrices[currency]) {
+                // Item natively supports this currency
+                finalPrice = item.VirtualCurrencyPrices[currency];
+                console.log('Using native currency price:', finalPrice, currency);
+            }
+
+            // Check if player has enough currency
+            const playerAmount = Number(virtualCurrency?.[currency]) || 0;
+            if (playerAmount < Number(finalPrice)) {
+                showPopup(`Insufficient ${currency}. You need ${finalPrice} but have ${playerAmount}.`, 'error');
+                return;
+            }
+
+            console.log('Making purchase request:', {
+                sessionTicket: sessionTicket ? 'present' : 'missing',
+                titleId,
+                storeId,
+                catalogVersion,
+                itemId: item.ItemId,
+                finalPrice,
+                currency
+            });
+
+            // For multi-currency purchases, we need to handle this differently
+            // If the item doesn't natively support the selected currency, we should:
+            // 1. First convert the player's currency to the item's native currency
+            // 2. Then purchase with the native currency
+
+            let purchaseResult;
+
+            if (item.VirtualCurrencyPrices && item.VirtualCurrencyPrices[currency]) {
+                // Item natively supports this currency - direct purchase
+                console.log('Direct purchase with native currency');
+                purchaseResult = await purchaseStoreItem(sessionTicket, titleId, storeId, catalogVersion, item.ItemId, Number(finalPrice), currency);
+            } else {
+                // Need to use original currency for purchase
+                console.log('Purchase requires currency conversion - using original currency for API call');
+
+                // For now, let's try purchasing with the original currency and original price
+                // In a real implementation, you might want to implement currency exchange first
+                purchaseResult = await purchaseStoreItem(sessionTicket, titleId, storeId, catalogVersion, item.ItemId, Number(originalPrice), originalCurrency);
+
+                // If successful, deduct the converted amount from player's selected currency
+                if (purchaseResult && !purchaseResult.error) {
+                    console.log('Purchase successful, need to handle currency conversion on backend');
+                    // Note: In a real implementation, you'd handle the currency conversion
+                    // through PlayFab's AddUserVirtualCurrency and SubtractUserVirtualCurrency APIs
+                }
+            }
+
+            console.log('Purchase result:', purchaseResult);
+
+            if (purchaseResult?.error) {
+                const errorMsg = purchaseResult.error.errorMessage || purchaseResult.errorMessage || 'Unknown error';
+                const errorCode = purchaseResult.error.code || purchaseResult.error || 'Unknown code';
+                showPopup(`Purchase failed: ${errorMsg} (Code: ${errorCode})`, 'error');
+                console.error('Purchase error details:', purchaseResult.error || purchaseResult);
+
+                // Add more specific error handling
+                if (errorMsg.toLowerCase().includes('item not found')) {
+                    showPopup(`Item "${item.ItemId}" not found in store "${storeId}". Please check PlayFab configuration.`, 'error');
+                } else if (errorMsg.toLowerCase().includes('insufficient')) {
+                    showPopup(`Insufficient ${currency}. You need ${finalPrice} but have ${playerAmount}.`, 'error');
+                }
+            } else {
+                showPopup(`Successfully purchased ${item.DisplayName || item.ItemId} for ${finalPrice} ${currency}!`, 'success');
+
+                // Refresh inventory and currency data
+                const refreshedInventory = await getUserInventory(sessionTicket, titleId);
+                if (refreshedInventory?.data) {
+                    setInventoryItems(refreshedInventory.data.Inventory || []);
+                    setVirtualCurrency(refreshedInventory.data.VirtualCurrency || {});
+                }
+            }
+        } catch (error) {
+            showPopup('Purchase failed due to a network error. Please try again.', 'error');
+            console.error('Purchase error:', error);
+        } finally {
+            setIsBuying(false);
+        }
+    };
+
     return (
-        <div className={styles.page}>
+        <div className="min-h-screen bg-background-primary transition-colors duration-300">
             {popup && (
                 <Popup
                     message={popup.message}
@@ -460,295 +487,93 @@ export default function Dashboard() {
                     onClose={() => setPopup(null)}
                 />
             )}
-            {tagline && <h1 className={styles.tagline}># Arena: {tagline}</h1>}
-            <div className={styles.header}>
-                <h1 className={styles.title}>Welcome 🎉, {session.user?.name ?? 'Player'}</h1>
 
-                {playFabId && (
-                    <span className={styles.playfabId}>
-                        ID: {playFabId}{' '}
-                        <button
-                            onClick={copyPlayFabId}
-                            className={styles.copyButton}
-                            aria-label="Copy PlayFab ID"
-                            type="button"
-                        >
-                            📋
-                        </button>
-                        {copied && <small className={styles.copiedText}>Copied!</small>}
-                    </span>
-                )}
+
+            {/* Hero Section */}
+            <div>
+                <HeroSection
+                    tagline={tagline}
+                    playFabId={playFabId}
+                    onCopyId={copyPlayFabId}
+                    copied={copied}
+                />
             </div>
-            {error && <p className={styles.error}>Error: {error}</p>}
 
-            <div className={styles.grid}>
-                {/* Player Statistics Card */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>Statistics</h2>
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(1)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                            <div className={styles['skeleton-chart']}></div>
-                        </>
-                    ) : playerStats.length === 0 ? (
-                        <p className={styles.empty}>No statistics available.</p>
-                    ) : (
-                        <>
-                            <ul className={styles.statList}>
-                                {playerStats.map(({ StatisticName, Value }) => (
-                                    <li key={StatisticName} className={styles.statItem}>
-                                        <span className={styles.statName}>{StatisticNameWithEmoji(StatisticName)}</span>
-                                        <span className={styles.statValue}>{Value}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <Bar
-                                data={playerStatsChartData}
-                                options={{
-                                    responsive: true,
-                                    plugins:
-                                    {
-                                        legend: { display: false },
-                                        title: { display: true, text: 'Player Statistics Chart' },
-                                    },
-                                    scales: {
-                                        y: { beginAtZero: true },
-                                    },
-                                }}
-                            />
-                        </>
-                    )}
-                </section>
-
-                {/* Inventory Card */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>Inventory</h2>
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(1)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                        </>
-                    ) : inventoryItems.length === 0 ? (
-                        <p className={styles.empty}>No items in inventory.</p>
-                    ) : (
-                        <ul className={styles.inventoryList}>
-                            {inventoryItems.map((item) => (
-                                <li key={item.ItemInstanceId} className={styles.inventoryItem}>
-                                    <strong>{item.DisplayName || item.ItemId}</strong> - Qty: {item.RemainingUses ?? 1}
-                                    <button
-                                        className={styles.useButton}
-                                        style={{ marginLeft: 12, padding: '0.3rem 0.8rem', fontSize: '0.95rem' }}
-                                        onClick={() => handleUseInventoryItem(item)}
-                                        disabled={isBuying}
-                                    >
-                                        Use
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
-
-                {/* Friends Card */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>Friends</h2>
-
-                    {friendAddStatus && <p className={styles.status}>{friendAddStatus}</p>}
-
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(1)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                        </>
-                    ) : friends.length === 0 ? (
-                        <p className={styles.empty}>No friends found.</p>
-                    ) : (
-                        <ul className={styles.friendsList}>
-                            {friends.map((friend) => (
-                                <li key={friend.FriendPlayFabId} className={styles.friendItem}>
-                                    <p> <b>{friend.TitleDisplayName}</b> <span className={styles.friendPlayfabID}>{friend.FriendPlayFabId}</span></p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
-
-                {/* Playtime Card */}
-                <section className={styles.card}>
-                    <h2 className={styles.cardTitle}>Playtime</h2>
-
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(1)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                            <div className={styles['skeleton-chart']}></div>
-                        </>
-                    ) : (
-                        <>
-                            <Doughnut data={data} options={options} />
-                            <p style={{ textAlign: 'center', marginTop: '1rem', fontWeight: 'bold' }}>
-                                {`Played: ${Math.floor(playtimeSeconds / 60)} min / ${Math.floor(totalSeconds / 60)} min`}
-                            </p>
-                        </>)}
-                </section>
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+                {error && (
+                    <div className="mb-4 bg-error text-text-primary px-4 py-3 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                            <svg className="w-5 h-5 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <span className="font-medium text-sm text-text-primary">Error: {error}</span>
+                        </div>
+                    </div>
+                )}
 
 
-                {/* Virtual Currency Card */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>Economy</h2>
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(1)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                            <div className={styles['skeleton-chart']}></div>
-                        </>
-                    ) : virtualCurrencyLabels.length === 0 ? (
-                        <p className={styles.empty}>No economy available.</p>
-                    ) : (
-                        <>
-                            <ul className={styles.currencyList}>
-                                {virtualCurrencyLabels.map((currency) => (
-                                    <li key={currency} className={styles.currencyItem}>
-                                        <span className={styles.currencyCode}>{currency}</span>
-                                        <span className={styles.currencyAmount}>
-                                            {virtualCurrency[currency].toLocaleString('en-IN')}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <Pie
-                                data={virtualCurrencyChartData}
-                                options={{
-                                    responsive: true,
-                                    plugins: {
-                                        legend: { position: 'bottom' },
-                                        title: { display: true, text: 'Arena economy distribution' },
-                                    },
-                                }}
-                            />
-                        </>
-                    )}
-                </section>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+                    <PlayerStatsChart
+                        gamesPlayed={parseInt(playerStats.find(s => ['Games Played', 'GamesPlayed', 'Games', 'TotalGames', 'GameCount', 'Matches', 'MatchesPlayed'].includes(s.StatisticName))?.Value || '0')}
+                        trophies={parseInt(playerStats.find(s => ['Trophies', 'Achievements', 'Awards'].includes(s.StatisticName))?.Value || '0')}
+                        loading={loading}
+                    />
+                    {/* Playtime Chart */}
+                    <PlaytimeChart
+                        playtimeSeconds={playtimeSeconds}
+                        totalSeconds={totalSeconds}
+                        loading={loading}
+                    />
 
-                {/* Store */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>Store</h2>
+                    {/* Virtual Currencies */}
+                    <VirtualCurrencies
+                        virtualCurrency={virtualCurrency}
+                        loading={loading}
+                    />
+                </div>
 
-                    {loading ? (
-                        <>
-                            <div className={styles['skeleton-title']}></div>
-                            {[...Array(3)].map((_, i) => (
-                                <div key={i} className={styles['skeleton-item']}></div>
-                            ))}
-                        </>
-                    ) : storeItems.length === 0 ? (
-                        <p className={styles.empty}>No store items available.</p>
-                    ) : (
-                        <ul className={styles.inventoryList}>
-                            {storeItems.map((item) => {
-                                const prices = item.VirtualCurrencyPrices || {};
-                                const itemCurrencies = Object.keys(prices);
-                                const selectedCurrency = currencySelections[item.ItemId] || itemCurrencies[0];
-                                const price = prices[selectedCurrency];
+                {/* Content Grid */}
+                <div className="mt-4">
 
-                                return (
-                                    <li key={item.ItemId} className={styles.inventoryItem}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                            <strong>{item.DisplayName || item.ItemId}</strong>
-                                            {/* <small>Catalog: {item.CatalogVersion || catalogVersion}</small> */}
+                    {/* Golden Tickets */}
+                    <GoldenTickets
+                        coupons={(() => {
+                            try {
+                                return userData.Coupons ? JSON.parse(userData.Coupons) : [];
+                            } catch {
+                                return [];
+                            }
+                        })()}
+                        loading={loading}
+                        onRedeem={handleRedeemCoupon}
+                    />
 
-                                            {/* Currency selector */}
-                                            <select
-                                                className={styles.currencySelect}
-                                                value={selectedCurrency}
-                                                onChange={(e) =>
-                                                    setCurrencySelections((prev) => ({
-                                                        ...prev,
-                                                        [item.ItemId]: e.target.value,
-                                                    }))
-                                                }
-                                                style={{ maxWidth: '120px' }}
-                                            >
-                                                {itemCurrencies.map((cur) => (
-                                                    <option key={cur} value={cur}>
-                                                        {cur} ({prices[cur]})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
+                </div>
 
-                                        <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '1rem', color: '#888' }}>
-                                                Price: {price.toLocaleString('en-IN')} {selectedCurrency}
-                                            </span>
-                                            <button
-                                                className={styles.buyButton}
-                                                onClick={() => { handleBuyStoreItem(item, price, selectedCurrency) }}
-                                            >
-                                                Buy
-                                            </button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </section>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
 
-                {/* Coupons Section */}
-                <section
-                    className={styles.card}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <h2 className={styles.cardTitle}>My Coupons</h2>
-                    {userData.Coupons && JSON.parse(userData.Coupons).length > 0 ? (
-                        <ul className={styles.userDataList}>
-                            {JSON.parse(userData.Coupons).map((code: string, idx: number) => (
-                                <li key={idx} className={styles.couponItem}>
-                                    <div className={styles.couponInfo}>
-                                        <span className={styles.couponLabel}>Coupon:</span>
-                                        <span className={styles.couponCode}>{code}</span>
-                                    </div>
-                                    <button
-                                        className={styles.redeemButton}
-                                        onClick={() => router.push(`coupon/redeem?code=${code}`)}
-                                    >
-                                        Redeem
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
+                    <Store
+                        storeItems={storeItems}
+                        loading={loading}
+                        virtualCurrency={virtualCurrency}
+                        onPurchase={handlePurchaseItem}
+                    />
+                    
+                    {/* Inventory */}
+                    <Inventory
+                        inventoryItems={inventoryItems}
+                        loading={loading}
+                        onUseItem={handleUseInventoryItem}
+                        isBuying={isBuying}
+                    />
 
-                    ) : (
-                        <p className={styles.empty}>No coupons yet.</p>
-                    )}
-                </section>
+
+
+
+                </div>
+
+
 
             </div>
         </div>

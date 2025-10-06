@@ -184,7 +184,7 @@ export async function updatePlayFabUserData(
     }
 }
 
-async function updatePlayerStatistics(
+export async function updatePlayerStatistics(
     sessionTicket: string,
     titleId: string,
     statistics: Statistics[]
@@ -524,6 +524,15 @@ export async function getStoreItems(sessionTicket: string, titleId: string, stor
 }
 
 export async function purchaseStoreItem(sessionTicket: string, titleId: string, storeId: string, catalogVersion: string, itemId: string, price: number, currencyCode = 'AC') {
+    console.log('PlayFab Purchase Request:', {
+        endpoint: `https://${titleId}.playfabapi.com/Client/PurchaseItem`,
+        storeId,
+        catalogVersion,
+        itemId,
+        price,
+        currencyCode
+    });
+    
     const res = await fetch(`https://${titleId}.playfabapi.com/Client/PurchaseItem`, {
         method: 'POST',
         headers: {
@@ -539,7 +548,10 @@ export async function purchaseStoreItem(sessionTicket: string, titleId: string, 
         }),
     });
 
-    return res.json();
+    const result = await res.json();
+    console.log('PlayFab Purchase Response:', result);
+    
+    return result;
 }
 
 export async function useInventoryItem(

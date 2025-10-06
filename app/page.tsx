@@ -17,8 +17,13 @@ export default function Home() {
 
   if (status === 'loading') {
     return (
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen gap-16 px-8 sm:px-20 py-20">
-        Loading...
+      <div className="min-h-screen bg-background-primary flex items-center justify-center transition-colors duration-300">
+        <div className="bg-card rounded-xl shadow-lg p-8 border border-border-light">
+          <div className="flex items-center space-x-3">
+            <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-secondary font-medium">Loading Arena...</span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -28,8 +33,13 @@ export default function Home() {
   }
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen gap-16 px-8 sm:px-20 py-20">
-      Redirecting...
+    <div className="min-h-screen bg-background-primary flex items-center justify-center transition-colors duration-300">
+      <div className="bg-card rounded-xl shadow-lg p-8 border border-border-light">
+        <div className="flex items-center space-x-3">
+          <div className="w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-secondary font-medium">Redirecting to Dashboard...</span>
+        </div>
+      </div>
     </div>
   );
 }

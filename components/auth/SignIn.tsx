@@ -1,7 +1,6 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import styles from './auth.module.css';
 import Image from 'next/image';
 import microsoftLogo from '../../public/icons/msoft.png';
 
@@ -31,21 +30,24 @@ export default function SignIn() {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.card}>
-                {/* <h1 className={styles.tagline}>Arena: {tagline}</h1> */}
-                <h3 className={styles.heading}>Please sign in to continue 🚀</h3>
-                <button className={styles.signInButton} onClick={handleSignIn}>
+        <div className="flex justify-center items-center min-h-screen p-4 animate-fade-in">
+            <div className="bg-white/4 backdrop-blur-lg rounded-3xl p-20 text-center shadow-2xl shadow-black/20 max-w-lg w-full animate-fade-in">
+                {/* <h1 className="text-base text-white/63 mb-2">Arena: {tagline}</h1> */}
+                <h3 className="text-3xl font-semibold text-white mb-8">Please sign in to continue 🚀</h3>
+                <button 
+                    className="inline-flex items-center gap-3 bg-gradient-to-br from-secondary-700 to-primary-600 border-0 py-3 px-6 text-base font-semibold text-white rounded-xl cursor-pointer shadow-lg shadow-primary-500/20 transition-all duration-300 hover:scale-105 hover:bg-gradient-to-br hover:from-primary-700 hover:to-accent-600 hover:shadow-xl hover:shadow-primary-500/30" 
+                    onClick={handleSignIn}
+                >
                     <Image
                         alt="Microsoft logo"
                         src={microsoftLogo}
                         width={20}
                         height={20}
-                        className={styles.logo}
+                        className="w-5 h-5"
                     />
                     <span>Continue with Microsoft</span>
                 </button>
-                <p className={styles.info}>
+                <p className="mt-8 text-gray-400 text-sm leading-relaxed">
                     Sign in with your work account to participate, save your progress, and maintain a fair competitive environment.
                 </p>
             </div>

@@ -32,21 +32,20 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className="dark">
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <SessionProvider session={session}>
           <UnitySessionProvider>
             <PlayTimeProvider>
               <PlayTimer />
-              <div style={{ display: 'flex', minHeight: '100vh' }}>
+              <div className="flex min-h-screen bg-background-primary transition-colors duration-300">
                 <SideBar />
-                <main style={{ flex: 1, paddingLeft: '5rem' }}>
+                <main className="flex-1 pl-20 min-h-screen">
                   {children}
                 </main>
               </div>
             </PlayTimeProvider>
           </UnitySessionProvider>
-
         </SessionProvider>
       </body>
     </html>

@@ -28,7 +28,8 @@ export async function initDb() {
             description TEXT,
             video TEXT,
             details TEXT,
-            publisher TEXT
+            publisher TEXT,
+            folderName TEXT
         );
 
         CREATE TABLE IF NOT EXISTS game_images (
@@ -46,6 +47,22 @@ export async function initDb() {
         );
     `);
 
+    // Add type column if it doesn't exist (migration)
+    try {
+        await db.exec(`ALTER TABLE games ADD COLUMN type TEXT DEFAULT 'unity'`);
+    } catch (error) {
+        // Column already exists, ignore the error
+        console.log('Type column already exists or migration failed:', error);
+    }
+
+    // Add folderName column if it doesn't exist (migration)
+    try {
+        await db.exec(`ALTER TABLE games ADD COLUMN folderName TEXT`);
+    } catch (error) {
+        // Column already exists, ignore the error
+        console.log('FolderName column already exists or migration failed:', error);
+    }
+
     await db.close();
 }
 
@@ -59,12 +76,14 @@ export type Game = {
     image?: string[];
     category?: string[];
     publisher?: string;
+    type?: string;
+    folderName?: string;
 };
 
 export async function insertGame(game: Game): Promise<number> {
     const db = await getDb();
 
-    const { id, buildName, title, description, video, details, image = [], category = [], publisher } = game;
+    const { id, buildName, title, description, video, details, image = [], category = [], publisher, type = 'unity', folderName } = game;
 
     if (id !== undefined) {
         await db.run(`DELETE FROM games WHERE id = ?`, [id]);
@@ -73,8 +92,8 @@ export async function insertGame(game: Game): Promise<number> {
     }
 
     const result = await db.run(
-        `INSERT INTO games (id, buildName, title, description, video, details, publisher) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [id ?? null, buildName, title, description, video, details, publisher]
+        `INSERT INTO games (id, buildName, title, description, video, details, publisher, type, folderName) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id ?? null, buildName, title, description, video, details, publisher, type, folderName]
     );
 
     const gameId = id ?? result.lastID!;
@@ -114,6 +133,11 @@ export async function getAllGames(): Promise<Game[]> {
 
         game.image = images.map(i => i.image_path);
         game.category = categories.map(c => c.category);
+        
+        // Ensure type field exists, default to 'unity' for existing games
+        if (!game.type) {
+            game.type = 'unity';
+        }
     }
 
     await db.close();
@@ -125,7 +149,7 @@ export async function getGameById(id: number): Promise<Game | null> {
     const db = await getDb();
 
     const game = await db.get(
-        `SELECT id, buildName, title, description, video, details, publisher FROM games WHERE id = ?`,
+        `SELECT id, buildName, title, description, video, details, publisher, type, folderName FROM games WHERE id = ?`,
         [id]
     );
 
@@ -155,6 +179,8 @@ export async function getGameById(id: number): Promise<Game | null> {
         image: images.map(img => img.image_path),
         category: categories.map(cat => cat.category),
         publisher: game.publisher,
+        type: game.type || 'unity', // Default to 'unity' if type is null/undefined
+        folderName: game.folderName,
     };
 }
 

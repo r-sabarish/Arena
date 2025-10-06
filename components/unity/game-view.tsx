@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useUnityContext, Unity } from 'react-unity-webgl';
 import { AddArenaCoins, AddGamePlayedCount, AddTrophies } from '@/lib/playfab/playfab';
-import styles from './game.module.css';
 import { useRouter } from 'next/navigation';
 import { useUnitySession } from '@/context/UnitySessionContext';
 import { usePlayTimeSession } from '@/context/PlayTimeContext';
@@ -96,15 +95,15 @@ const GameView: React.FC<PlayGameProps> = ({ Id, Name }) => {
     };
 
     return (
-        <div style={{ width: '100%', height: '100vh', position: 'relative', backgroundColor: '#001f3f' }}>
+        <div className="relative w-full h-screen bg-background-primary">
             <Unity
                 unityProvider={unityProvider}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                }}
+                className="w-full h-full"
             />
-            <button className={styles.backButton} onClick={handleExit}>
+            <button 
+                className="absolute top-4 right-4 z-10 bg-gradient-to-br from-accent-600 to-accent-700 text-white border-0 py-2 px-5 text-base font-semibold rounded-lg cursor-pointer mb-6 transition-all duration-300 select-none hover:bg-gradient-to-br hover:from-accent-700 hover:to-accent-800 hover:shadow-lg hover:shadow-accent-500/25" 
+                onClick={handleExit}
+            >
                 ← Back
             </button>
         </div>
